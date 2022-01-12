@@ -1,4 +1,5 @@
 import AppError from '@shared/errors/AppError';
+import { hash } from 'bcryptjs';
 import { getCustomRepository } from 'typeorm';
 import User from '../typeorm/entities/User';
 import { UsersRepository } from '../typeorm/repositories/UsersRepositories';
@@ -15,7 +16,7 @@ class UpdateUserService {
     const usersRepository = getCustomRepository(UsersRepository);
     const user = await usersRepository.findOne(id);
     if (!user) {
-      throw new AppError('Product not found.');
+      throw new AppError('User not exist.');
     }
     const usersExists = await usersRepository.findByName(name);
 
@@ -23,9 +24,11 @@ class UpdateUserService {
       throw new AppError('Email address already used');
     }
 
+    const hashedPassword = await hash(password, 8);
+
     user.name = name;
     user.email = email;
-    user.password = password;
+    user.password = hashedPassword;
 
     await usersRepository.save(user);
     return user;
