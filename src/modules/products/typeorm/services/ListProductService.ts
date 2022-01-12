@@ -5,8 +5,8 @@ import { ProductRepository } from '../repositories/ProductsRepository';
 class ListProductService {
   public async execute(): Promise<Product[]> {
     const productsRepository = getCustomRepository(ProductRepository);
-    const product = productsRepository.find();
-    return product;
+    const products = productsRepository.find();
+    return products;
   }
 }
 export default ListProductService;
