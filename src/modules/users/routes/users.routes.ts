@@ -1,10 +1,15 @@
 import { Router } from 'express';
 import UserController from '../controllers/UsersController';
+import multer from 'multer';
+import uploadConfig from '@config/upload';
 import { celebrate, Joi, Segments } from 'celebrate';
 import isAuthenticated from '../../../shared/http/middlewares/isAuthenticated';
+import UserAvatarController from '../controllers/UsersAvatarController';
 
 const usersRouter = Router();
 const usersController = new UserController();
+const usersAvatarController = new UserAvatarController();
+const upload = multer(uploadConfig);
 
 usersRouter.get('/', isAuthenticated, usersController.index);
 
@@ -49,6 +54,12 @@ usersRouter.delete(
     [Segments.PARAMS]: { id: Joi.string().uuid().required() },
   }),
   usersController.delete,
+);
+usersRouter.patch(
+  '/avatar',
+  isAuthenticated,
+  upload.single('avatar'),
+  usersAvatarController.update,
 );
 
 export default usersRouter;

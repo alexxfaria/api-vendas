@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { getCustomRepository } from 'typeorm';
 import User from '../typeorm/entities/User';
-import { UsersRepository } from '../typeorm/repositories/UsersRepositories';
+import UsersRepository from '../typeorm/repositories/UsersRepositories';
 import uploadConfig from '@config/upload';
 
 interface IRequest {
@@ -26,7 +26,7 @@ class UpdateUserAvatarService {
       const userAvatarFileExists = await fs.promises.stat(userAvatarFilePath);
 
       if (userAvatarFileExists) {
-        await fs.promises.unlink(userAvatarFilePath);
+        await fs.promises.unlink(userAvatarFilePath); //Deleta o avatar
       }
     }
     user.avatar = avatarFilename;
