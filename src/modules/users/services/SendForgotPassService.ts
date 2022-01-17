@@ -3,7 +3,7 @@ import AppError from '@shared/errors/AppError';
 import path from 'path';
 import { getCustomRepository } from 'typeorm';
 import { UsersRepository } from '../typeorm/repositories/UsersRepositories';
-import UsersTokenRepository from '../typeorm/repositories/UsersTokenRepositories';
+import UsersTokenRepository from '../typeorm/repositories/UsersTokenRepository';
 
 interface IRequest {
   email: string;
