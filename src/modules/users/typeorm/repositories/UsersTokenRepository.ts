@@ -2,7 +2,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import UserToken from '../entities/UserToken';
 
 @EntityRepository(UserToken)
-export class UsersTokenRepository extends Repository<UserToken> {
+class UsersTokenRepository extends Repository<UserToken> {
   public async findByToken(token: string): Promise<UserToken | undefined> {
     const userToken = this.findOne({
       where: {
