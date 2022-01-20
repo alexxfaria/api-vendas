@@ -10,6 +10,16 @@ ordersRouter.use(isAuthenticated);
 
 ordersRouter.get('/', ordersController.index);
 
+ordersRouter.get(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    },
+  }),
+  ordersController.show,
+);
+
 ordersRouter.post(
   '/',
   celebrate({
@@ -19,15 +29,6 @@ ordersRouter.post(
     },
   }),
   ordersController.create,
-);
-ordersRouter.get(
-  '/:id',
-  celebrate({
-    [Segments.PARAMS]: {
-      id: Joi.string().uuid().required(),
-    },
-  }),
-  ordersController.show,
 );
 // ordersRouter.put(
 //   '/:id',
@@ -40,12 +41,12 @@ ordersRouter.get(
 //   }),
 //   ordersController.update,
 // );
-// ordersRouter.delete(
-//   '/:id',
-//   celebrate({
-//     [Segments.PARAMS]: { id: Joi.string().uuid().required() },
-//   }),
-//   ordersController.delete,
-// );
+ordersRouter.delete(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: { id: Joi.string().uuid().required() },
+  }),
+  ordersController.delete,
+);
 
 export default ordersRouter;

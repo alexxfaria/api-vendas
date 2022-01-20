@@ -19,6 +19,7 @@ class OrdersRepository extends Repository<Order> {
     const order = this.findOne(id, {
       relations: ['order_products', 'customers'],
     });
+    console.log('order');
     return order;
   }
   public async createOrder({ customer, products }: IRequest): Promise<Order> {
