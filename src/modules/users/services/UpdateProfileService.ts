@@ -2,7 +2,7 @@ import AppError from '@shared/errors/AppError';
 import { compare, hash } from 'bcryptjs';
 import { getCustomRepository } from 'typeorm';
 import User from '../typeorm/entities/User';
-import { UsersRepository } from '../typeorm/repositories/UsersRepositories';
+import UsersRepository from '../typeorm/repositories/UsersRepositories';
 
 interface IRequest {
   user_id: string;
@@ -13,13 +13,7 @@ interface IRequest {
 }
 
 class UpdateProfileService {
-  public async execute({
-    user_id,
-    name,
-    email,
-    password,
-    old_password,
-  }: IRequest): Promise<User> {
+  public async execute({ user_id, name, email, password, old_password }: IRequest): Promise<User> {
     const usersRepository = getCustomRepository(UsersRepository);
 
     const user = await usersRepository.findOne(user_id);

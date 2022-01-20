@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import ProductController from '../controllers/ProductsController';
 import { celebrate, Joi, Segments } from 'celebrate';
+import isAuthenticated from '@shared/http/middlewares/isAuthenticated';
 
 const productsRouter = Router();
 const productsController = new ProductController();
+
+productsRouter.use(isAuthenticated);
 
 productsRouter.get('/', productsController.index);
 
@@ -38,6 +41,16 @@ productsRouter.put(
     [Segments.PARAMS]: { id: Joi.string().uuid().required() },
   }),
   productsController.update,
+);
+productsRouter.patch(
+  '/:id',
+  celebrate({
+    [Segments.BODY]: {
+      quantity: Joi.number().required(),
+    },
+    [Segments.PARAMS]: { id: Joi.string().uuid().required() },
+  }),
+  productsController.patchQuantity,
 );
 productsRouter.delete(
   '/:id',

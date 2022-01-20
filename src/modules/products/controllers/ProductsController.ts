@@ -4,6 +4,7 @@ import DeleteProductService from '../services/DeleteProductService';
 import ListProductService from '../services/ListProductService';
 import ShowProductService from '../services/ShowProductService';
 import UpdateProductService from '../services/UpdateProductService';
+import UpdateQuantityProductService from '../services/UpdateQuantityProductService';
 
 class ProductController {
   public async index(req: Request, res: Response): Promise<Response> {
@@ -44,6 +45,18 @@ class ProductController {
       id,
       name,
       price,
+      quantity,
+    });
+    return res.json(product);
+  }
+  public async patchQuantity(req: Request, res: Response): Promise<Response> {
+    const { quantity } = req.body;
+    const { id } = req.params;
+
+    const updateQuantityProduct = new UpdateQuantityProductService();
+
+    const product = await updateQuantityProduct.execute({
+      id,
       quantity,
     });
     return res.json(product);
