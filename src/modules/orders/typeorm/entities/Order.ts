@@ -1,5 +1,6 @@
-import Customers from '@modules/customers/typeorm/entities/Customers';
+import Customers from '../../../customers/typeorm/entities/Customers';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -23,6 +24,9 @@ class Order {
     cascade: true,
   })
   order_products: OrdersProducts[];
+
+  @Column()
+  customer_id: string;
 
   @CreateDateColumn()
   created_at: Date;

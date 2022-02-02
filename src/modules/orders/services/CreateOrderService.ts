@@ -18,19 +18,19 @@ interface IRequest {
 class CreateOrderService {
   public async execute({ customer_id, products }: IRequest): Promise<Order> {
     const ordersRepository = getCustomRepository(OrdersRepository);
-    const customerRepository = getCustomRepository(CustomersRepository);
+    const customersRepository = getCustomRepository(CustomersRepository);
     const productsRepository = getCustomRepository(ProductRepository);
 
-    const customersExists = await customerRepository.findById(customer_id);
+    const customerExists = await customersRepository.findById(customer_id);
 
-    if (!customersExists) {
-      throw new AppError(`Customer ${customer_id} not found`);
+    if (!customerExists) {
+      throw new AppError(`Cliente não encontrado.`);
     }
 
     const productsExists = await productsRepository.findAllByIds(products);
 
     if (!productsExists.length) {
-      throw new AppError(`Product ${products} not found`);
+      throw new AppError(`Produto não encontrado.`);
     }
 
     const productsExistsIds = productsExists.map(product => product.id);
@@ -40,7 +40,7 @@ class CreateOrderService {
     );
 
     if (checkInexistentProducts.length) {
-      throw new AppError(`Could not find products with id ${checkInexistentProducts[0]}.`);
+      throw new AppError(`Could not find products with id ${checkInexistentProducts[0].id}`);
     }
 
     const quantityAvailable = products.filter(
@@ -60,7 +60,7 @@ class CreateOrderService {
     }));
 
     const order = await ordersRepository.createOrder({
-      customer: customersExists,
+      customer: customerExists,
       products: serializedProducts,
     });
 

@@ -30,6 +30,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     status: 'error',
     message: 'Internal Server Error',
   });
+  console.log(error);
 });
 
 app.listen(3333, () => {

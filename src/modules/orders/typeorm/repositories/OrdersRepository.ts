@@ -1,4 +1,4 @@
-import Customers from '@modules/customers/typeorm/entities/Customers';
+import Customers from '../../../customers/typeorm/entities/Customers';
 import { EntityRepository, Repository } from 'typeorm';
 import Order from '../entities/Order';
 
@@ -17,9 +17,8 @@ interface IRequest {
 class OrdersRepository extends Repository<Order> {
   public async findById(id: string): Promise<Order | undefined> {
     const order = this.findOne(id, {
-      relations: ['order_products', 'customers'],
+      relations: ['order_products', 'customer'],
     });
-    console.log('order');
     return order;
   }
   public async createOrder({ customer, products }: IRequest): Promise<Order> {
