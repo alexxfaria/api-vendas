@@ -32,7 +32,7 @@ class UsersController {
 
     const user = await createUser.execute({ name, email, password });
 
-    return res.json(user);
+    return res.json(instanceToInstance(user));
   }
 
   public async update(req: Request, res: Response): Promise<Response> {
@@ -43,7 +43,7 @@ class UsersController {
 
     const user = await updateUser.execute({ id, name, email, password });
 
-    return res.json(user);
+    return res.json(instanceToInstance(user));
   }
 
   public async delete(req: Request, res: Response): Promise<Response> {
