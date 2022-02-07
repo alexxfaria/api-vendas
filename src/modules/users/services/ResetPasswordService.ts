@@ -1,9 +1,9 @@
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import { hash } from 'bcryptjs';
-import UsersTokenRepository from '../typeorm/repositories/UsersTokenRepository';
+import UsersTokenRepository from '../infra/typeorm/repositories/UsersTokenRepository';
 import { isAfter, addHours } from 'date-fns';
-import UsersRepository from '../typeorm/repositories/UsersRepositories';
+import UsersRepository from '../infra/typeorm/repositories/UsersRepositories';
 import RedisCache from '@shared/cache/RedisCache';
 
 interface IRequest {
