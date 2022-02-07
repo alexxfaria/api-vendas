@@ -1,3 +1,4 @@
+import RedisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import Customers from '../typeorm/entities/Customers';
@@ -12,6 +13,7 @@ interface IRequest {
 class UpdateCustomerService {
   public async execute({ id, name, email }: IRequest): Promise<Customers> {
     const customerRepository = getCustomRepository(CustomersRepository);
+    const redisCache = new RedisCache();
     const customer = await customerRepository.findOne(id);
     if (!customer) {
       throw new AppError('Customer not exist.');
@@ -24,7 +26,7 @@ class UpdateCustomerService {
 
     customer.name = name;
     customer.email = email;
-
+    await redisCache.invalidate('api-vendas-CUSTOMERS_LIST');
     await customerRepository.save(customer);
     return customer;
   }

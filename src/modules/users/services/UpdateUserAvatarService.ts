@@ -5,6 +5,7 @@ import { getCustomRepository } from 'typeorm';
 import User from '../typeorm/entities/User';
 import UsersRepository from '../typeorm/repositories/UsersRepositories';
 import uploadConfig from '@config/upload';
+import RedisCache from '@shared/cache/RedisCache';
 
 interface IRequest {
   user_id: string;
@@ -14,6 +15,7 @@ interface IRequest {
 class UpdateUserAvatarService {
   public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
     const usersRepository = getCustomRepository(UsersRepository);
+    const redisCache = new RedisCache();
 
     const user = await usersRepository.findById(user_id);
 
@@ -30,6 +32,7 @@ class UpdateUserAvatarService {
       }
     }
     user.avatar = avatarFilename;
+    await redisCache.invalidate('api-vendas-USER_LIST');
 
     await usersRepository.save(user);
 

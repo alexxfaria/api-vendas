@@ -4,6 +4,7 @@ import { hash } from 'bcryptjs';
 import UsersTokenRepository from '../typeorm/repositories/UsersTokenRepository';
 import { isAfter, addHours } from 'date-fns';
 import UsersRepository from '../typeorm/repositories/UsersRepositories';
+import RedisCache from '@shared/cache/RedisCache';
 
 interface IRequest {
   token: string;
@@ -14,6 +15,7 @@ class ResetPasswordService {
   public async execute({ token, password }: IRequest): Promise<void> {
     const usersRepository = getCustomRepository(UsersRepository);
     const usersTokenRepository = getCustomRepository(UsersTokenRepository);
+    const redisCache = new RedisCache();
 
     const userToken = await usersTokenRepository.findByToken(token);
 
@@ -34,7 +36,7 @@ class ResetPasswordService {
     }
     const hashedPassword = await hash(password, 8);
     user.password = hashedPassword;
-
+    await redisCache.invalidate('api-vendas-USER_LIST');
     await usersRepository.save(user);
   }
 }

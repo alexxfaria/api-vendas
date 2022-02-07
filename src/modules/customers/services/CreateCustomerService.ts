@@ -1,3 +1,4 @@
+import RedisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import Customers from '../typeorm/entities/Customers';
@@ -11,6 +12,7 @@ interface IRequest {
 class CreateCustomerService {
   public async execute({ name, email }: IRequest): Promise<Customers> {
     const customersRepository = getCustomRepository(CustomersRepository);
+    const redisCache = new RedisCache();
     const emailExists = await customersRepository.findByEmail(email);
 
     if (emailExists) {
@@ -20,6 +22,7 @@ class CreateCustomerService {
       name,
       email,
     });
+    await redisCache.invalidate('api-vendas-CUSTOMERS_LIST');
     await customersRepository.save(customers);
     return customers;
   }

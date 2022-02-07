@@ -1,3 +1,4 @@
+import RedisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
 import { hash } from 'bcryptjs';
 import { getCustomRepository } from 'typeorm';
@@ -14,6 +15,7 @@ interface IRequest {
 class UpdateUserService {
   public async execute({ id, name, email, password }: IRequest): Promise<User> {
     const usersRepository = getCustomRepository(UsersRepository);
+    const redisCache = new RedisCache();
     const user = await usersRepository.findOne(id);
     if (!user) {
       throw new AppError('User not exist.');
@@ -30,6 +32,7 @@ class UpdateUserService {
     user.email = email;
     user.password = hashedPassword;
 
+    await redisCache.invalidate('api-vendas-USER_LIST');
     await usersRepository.save(user);
     return user;
   }
