@@ -1,26 +1,20 @@
-import RedisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
 import { hash } from 'bcryptjs';
-import { getCustomRepository } from 'typeorm';
-import User from '../infra/typeorm/entities/User';
-import UsersRepository from '../infra/typeorm/repositories/UsersRepositories';
+import { inject, injectable } from 'tsyringe';
+import { IUpdateUser } from '../domain/models/IUpdateUser';
+import { IUser } from '../domain/models/IUser';
+import { IUsersRepository } from '../domain/repositories/IUsersRepository';
 
-interface IRequest {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-}
-
+@injectable()
 class UpdateUserService {
-  public async execute({ id, name, email, password }: IRequest): Promise<User> {
-    const usersRepository = getCustomRepository(UsersRepository);
-    const redisCache = new RedisCache();
-    const user = await usersRepository.findOne(id);
+  constructor(@inject('UsersRepository') private usersRepository: IUsersRepository) {}
+
+  public async execute({ id, name, email, password }: IUpdateUser): Promise<IUser> {
+    const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new AppError('User not exist.');
     }
-    const usersExists = await usersRepository.findByName(email);
+    const usersExists = await this.usersRepository.findByName(email);
 
     if (usersExists && email != user.email) {
       throw new AppError('Email address already used');
@@ -32,8 +26,7 @@ class UpdateUserService {
     user.email = email;
     user.password = hashedPassword;
 
-    await redisCache.invalidate('api-vendas-USER_LIST');
-    await usersRepository.save(user);
+    await this.usersRepository.save(user);
     return user;
   }
 }

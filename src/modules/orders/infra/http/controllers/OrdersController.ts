@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import CreateOrderService from '../../../services/CreateOrderService';
 import DeleteOrderService from '../../../services/DeleteOrderService';
 import ListOrderService from '../../../services/ListOrderService';
@@ -8,7 +9,7 @@ class OrdersController {
   public async show(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    const showOrder = new ShowOrderService();
+    const showOrder = container.resolve(ShowOrderService);
 
     const order = await showOrder.execute({ id });
 
@@ -17,14 +18,14 @@ class OrdersController {
   public async create(req: Request, res: Response): Promise<Response> {
     const { customer_id, products } = req.body;
 
-    const createOrder = new CreateOrderService();
+    const createOrder = container.resolve(CreateOrderService);
 
     const order = await createOrder.execute({ customer_id, products });
 
     return res.json(order);
   }
   public async index(req: Request, res: Response): Promise<Response> {
-    const listOrders = new ListOrderService();
+    const listOrders = container.resolve(ListOrderService);
 
     const orders = await listOrders.execute();
 
@@ -43,7 +44,7 @@ class OrdersController {
   public async delete(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    const deleteOrder = new DeleteOrderService();
+    const deleteOrder = container.resolve(DeleteOrderService);
 
     await deleteOrder.execute({ id });
 

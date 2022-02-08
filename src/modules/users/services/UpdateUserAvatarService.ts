@@ -1,23 +1,18 @@
 import AppError from '@shared/errors/AppError';
 import path from 'path';
 import fs from 'fs';
-import { getCustomRepository } from 'typeorm';
-import User from '../infra/typeorm/entities/User';
-import UsersRepository from '../infra/typeorm/repositories/UsersRepositories';
 import uploadConfig from '@config/upload';
-import RedisCache from '@shared/cache/RedisCache';
+import { IUpdateUserAvatar } from '../domain/models/IUpdateUserAvatar';
+import { inject, injectable } from 'tsyringe';
+import { IUsersRepository } from '../domain/repositories/IUsersRepository';
+import { IUser } from '../domain/models/IUser';
 
-interface IRequest {
-  user_id: string;
-  avatarFilename: string;
-}
-
+@injectable()
 class UpdateUserAvatarService {
-  public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
-    const usersRepository = getCustomRepository(UsersRepository);
-    const redisCache = new RedisCache();
+  constructor(@inject('UsersRepository') private usersRepository: IUsersRepository) {}
 
-    const user = await usersRepository.findById(user_id);
+  public async execute({ user_id, avatarFilename }: IUpdateUserAvatar): Promise<IUser> {
+    const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found.');
@@ -32,9 +27,7 @@ class UpdateUserAvatarService {
       }
     }
     user.avatar = avatarFilename;
-    await redisCache.invalidate('api-vendas-USER_LIST');
-
-    await usersRepository.save(user);
+    await this.usersRepository.save(user);
 
     return user;
   }

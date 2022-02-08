@@ -1,28 +1,24 @@
 import AppError from '@shared/errors/AppError';
-import { getCustomRepository } from 'typeorm';
 import { hash } from 'bcryptjs';
-import UsersTokenRepository from '../infra/typeorm/repositories/UsersTokenRepository';
 import { isAfter, addHours } from 'date-fns';
-import UsersRepository from '../infra/typeorm/repositories/UsersRepositories';
-import RedisCache from '@shared/cache/RedisCache';
+import { IResetPassword } from '../domain/models/IResetPassword';
+import { inject, injectable } from 'tsyringe';
+import { IUsersRepository } from '../domain/repositories/IUsersRepository';
+import { IUserTokensRepository } from '../domain/repositories/IUserTokensRepository';
 
-interface IRequest {
-  token: string;
-  password: string;
-}
-
+@injectable()
 class ResetPasswordService {
-  public async execute({ token, password }: IRequest): Promise<void> {
-    const usersRepository = getCustomRepository(UsersRepository);
-    const usersTokenRepository = getCustomRepository(UsersTokenRepository);
-    const redisCache = new RedisCache();
-
-    const userToken = await usersTokenRepository.findByToken(token);
+  constructor(
+    @inject('UsersRepository') private usersRepository: IUsersRepository,
+    @inject('UsersTokenRepository') private usersTokenRepository: IUserTokensRepository,
+  ) {}
+  public async execute({ token, password }: IResetPassword): Promise<void> {
+    const userToken = await this.usersTokenRepository.findByToken(token);
 
     if (!userToken) {
       throw new AppError('User Token does not exists');
     }
-    const user = await usersRepository.findById(userToken.user_id);
+    const user = await this.usersRepository.findById(userToken.user_id);
 
     if (!user) {
       throw new AppError('User does not exists');
@@ -36,8 +32,7 @@ class ResetPasswordService {
     }
     const hashedPassword = await hash(password, 8);
     user.password = hashedPassword;
-    await redisCache.invalidate('api-vendas-USER_LIST');
-    await usersRepository.save(user);
+    await this.usersRepository.save(user);
   }
 }
 export default ResetPasswordService;

@@ -1,23 +1,17 @@
-import RedisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
-import { getCustomRepository } from 'typeorm';
-import OrdersRepository from '../infra/typeorm/repositories/OrdersRepository';
+import { inject, injectable } from 'tsyringe';
+import { IShowOrder } from '../domain/models/IShowOrder ';
+import { IOrdersRepository } from '../domain/repositories/IOrdersRepository';
 
-interface IRequest {
-  id: string;
-}
-
+@injectable()
 class DeleteOrderService {
-  public async execute({ id }: IRequest): Promise<void> {
-    const ordersRepository = getCustomRepository(OrdersRepository);
-    const redisCache = new RedisCache();
-
-    const order = await ordersRepository.findOne(id);
+  constructor(@inject('OrdersRepository') private ordersRepository: IOrdersRepository) {}
+  public async execute({ id }: IShowOrder): Promise<void> {
+    const order = await this.ordersRepository.findById(id);
     if (!order) {
       throw new AppError('Order not found.');
     }
-    await redisCache.invalidate('api-vendas-ORDER_LIST');
-    await ordersRepository.remove(order);
+    await this.ordersRepository.remove(order);
   }
 }
 export default DeleteOrderService;
