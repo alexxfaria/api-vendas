@@ -28,18 +28,17 @@ class OrdersController {
     const listOrders = container.resolve(ListOrderService);
 
     const orders = await listOrders.execute();
-
     return res.json(orders);
   }
   // public async update(req: Request, res: Response): Promise<Response> {
-  //   const { name, email } = req.body;
+  //   const { customer_id, products } = req.body;
   //   const { id } = req.params;
 
-  //   const updateCustomer = new UpdateCustomerService();
+  //   const updateOrder = container.resolve(UpdateOrderService);
 
-  //   const customer = await updateCustomer.execute({ id, name, email });
+  //   const order = await updateOrder.execute({ id, customer_id, products });
 
-  //   return res.json(customer);
+  //   return res.json(order);
   // }
   public async delete(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
